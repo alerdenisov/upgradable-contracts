@@ -20,12 +20,12 @@
 
 pragma solidity ^0.4.18;
 
+import "./ICounter.sol";
 import "../../base/UIntStorage.sol";
-
 
 /// @title Incremental implementation of counter for explanation external storage pattern
 /// @author Aler Denisov
-contract IncrementCounter {
+contract IncrementCounter is ICounter {
   /// @notice Instance of uint storage to store current counter value
   /// @dev Should be valid instance of storage
   UIntStorage public counter;
