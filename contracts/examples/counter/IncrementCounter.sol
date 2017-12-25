@@ -26,18 +26,28 @@ import "../../base/UIntStorage.sol";
 /// @title Incremental implementation of counter for explanation external storage pattern
 /// @author Aler Denisov
 contract IncrementCounter is ICounter {
+  /// @notice Method modifier to ensure providen storage is UIntStorage
+  /// @param _storage Instance of uint storage of counter
+  /// @dev Throw error if storage isn't valid
+  modifier validStorage(address _storage) {
+    require(validateStorage(_storage));
+    _;
+  }
+  
   /// @notice Increment counter on one tick each time when endpoint call incrementCounter via interface
+  /// @param _storage Instance of uint storage of counter
   /// @dev Implementation of Counter interface 
   /// @return Current value of counter (after increment)
-  function increaseCounter(address _storage) public returns (uint) {
+  function increaseCounter(address _storage) validStorage(_storage) public returns (uint) {
     UIntStorage counter = UIntStorage(_storage);
     require(counter.isUIntStorage());
     return counter.setValue(counter.getValue() + 1);
   }
 
   /// @notice Import stored value from external storage
+  /// @param _storage Instance of uint storage of counter
   /// @return Current value of counter 
-  function getCounter(address _storage) public view returns (uint) {
+  function getCounter(address _storage) validStorage(_storage) public view returns (uint) {
     UIntStorage counter = UIntStorage(_storage);
     require(counter.isUIntStorage());
     return counter.getValue();
