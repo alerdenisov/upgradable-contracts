@@ -24,11 +24,18 @@ pragma solidity ^0.4.18;
 /// @author Aler Denisov
 interface ICounter {
   /// @notice Method to increase the counter
+  /// @param _storage Instance of uint storage of counter
   /// @dev Should be overrided by children contracts
-  function increaseCounter() public returns (uint);
+  function increaseCounter(address _storage) public returns (uint);
 
   /// @notice Method to receive current value of the counter
+  /// @param _storage Instance of uint storage of counter
   /// @return Current value of counter 
   /// @dev Should be overrided by children contracts
-  function getCounter() public view returns (uint);
+  function getCounter(address _storage) public view returns (uint);
+
+  /// @notice Method to validate received storage
+  /// @param _storage Instance of uint storage of counter
+  /// @return True if storage is valid, false\revert overwise
+  function validateStorage(address _storage) public view returns (bool);
 }
