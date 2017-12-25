@@ -40,4 +40,10 @@ contract UIntStorage {
   function getValue() external view returns (uint) {
     return value;
   }
+
+  /// @notice Flag contract as UInt storage to check inside external contracts
+  /// @return True flag of implementation UIntStorage
+  function isUIntStorage() external pure returns (bool) {
+    return true;
+  }
 }
