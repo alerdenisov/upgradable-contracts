@@ -1,15 +1,17 @@
 import expectThrow from './utils/expectThrow'
 
 const IncrementCounter = artifacts.require('./IncrementCounter.sol')
+const IncrementCounterPhaseTwo = artifacts.require('./IncrementCounterPhaseTwo.sol')
 const UIntStorage = artifacts.require('./UIntStorage.sol')
 const BoolStorage = artifacts.require('./BoolStorage.sol')
 
 contract('IncrementCounter', ([owner, user]) => {
-  let counter, storage, fakeStorage
+  let counter, storage, fakeStorage, secondCounter
   before(async () => {
     storage = await UIntStorage.new()
     fakeStorage = await BoolStorage.new()
     counter = await IncrementCounter.new()
+    secondCounter = await IncrementCounterPhaseTwo.new()
 
     await storage.transferOwnership(counter.address)
   })
@@ -40,5 +42,32 @@ contract('IncrementCounter', ([owner, user]) => {
 
   it('Should unvalidate fake storage', async () => {
     await expectThrow(counter.validateStorage(fakeStorage.address))
+  })
+
+  it('Should transfer ownership', async () => {
+    await counter.transferStorage(storage.address, secondCounter.address);
+  })
+
+  it('Should reject increase from outdated counter', async () => {
+    await expectThrow(counter.increaseCounter(storage.address));
+  })
+
+  it('Should increase counter with new logic', async () => {
+    await secondCounter.increaseCounter(storage.address)
+    const newValue = await secondCounter.getCounter(storage.address)
+    assert(newValue.eq(11), `Unxpected counter value: ${newValue.toString(10)}`)
+  })
+
+  it('Should reject non-authenticated transfer storage', async () => {
+    await expectThrow(secondCounter.transferStorage(storage.address, user))
+  })
+
+  it('Should reject increase from user fron previous test', async () => {
+    await expectThrow(storage.setValue(100500, { from: user }))
+  })
+
+  it('Should store 11 as before', async () => {
+    const storedValue = await storage.getValue()
+    assert(storedValue.eq(11), `Unxpected stored value: ${storedValue.toString(10)}`)
   })
 })

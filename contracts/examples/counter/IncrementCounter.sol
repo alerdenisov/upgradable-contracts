@@ -33,7 +33,7 @@ contract IncrementCounter is ICounter {
     require(validateStorage(_storage));
     _;
   }
-  
+
   /// @notice Increment counter on one tick each time when endpoint call incrementCounter via interface
   /// @param _storage Instance of uint storage of counter
   /// @dev Implementation of Counter interface 
@@ -58,5 +58,14 @@ contract IncrementCounter is ICounter {
   /// @return True if storage is valid, false\revert overwise
   function validateStorage(address _storage) public view returns (bool) {
     return UIntStorage(_storage).isUIntStorage();
+  }
+
+  /// @notice Method to transfer ownership of storage to another counter
+  /// @param _storage Instance of uint storage of counter
+  /// @param _counter Instance of ICounter implementation to transfer ownership
+  /// @return True if ownership is transfered, false\revert overwise
+  function transferStorage(address _storage, address _counter) validStorage(_storage) public returns (bool) {
+    UIntStorage(_storage).transferOwnership(_counter);
+    return true;
   }
 }
