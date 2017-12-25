@@ -20,17 +20,18 @@
 
 pragma solidity ^0.4.18;
 
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /// @title Plain uint storage for external usage 
 /// @author Aler Denisov
-contract UIntStorage {
+contract UIntStorage is Ownable {
   /// @notice Private store point of uint type value
   uint private value;
 
   /// @notice External method to store new value
   /// @dev Storage didn't fire any events. Ensure your external contract did that if events is required.
   /// @return Stored value in storage (after change)
-  function setValue(uint _value) external returns (uint) {
+  function setValue(uint _value) onlyOwner external returns (uint) {
     value = _value;
     return value;
   }

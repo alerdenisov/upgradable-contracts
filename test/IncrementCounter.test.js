@@ -10,6 +10,8 @@ contract('IncrementCounter', ([owner, user]) => {
     storage = await UIntStorage.new()
     fakeStorage = await BoolStorage.new()
     counter = await IncrementCounter.new()
+
+    await storage.transferOwnership(counter.address)
   })
 
   it('Should receive 0 at begin', async () => {

@@ -28,6 +28,7 @@
     "ethereumjs-testrpc": "^6.0.3",
     "remixd": "^0.1.2",
     "sol-merger": "^0.1.2",
-    "truffle": "^4.0.4"
+    "truffle": "^4.0.4",
+    "zeppelin-solidity": "^1.4.0"
   }
 }
