@@ -59,7 +59,7 @@ contract('IncrementCounter', ([owner, user]) => {
   })
 
   it('Should reject non-authenticated transfer storage', async () => {
-    await expectThrow(secondCounter.transferStorage(storage.address, user))
+    await expectThrow(secondCounter.transferStorage(storage.address, user, { from: user }))
   })
 
   it('Should reject increase from user fron previous test', async () => {
