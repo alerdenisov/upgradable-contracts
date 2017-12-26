@@ -25,6 +25,7 @@ function increaseCounter() public returns (uint) {
 
 Для реализации слоя данных хранящего текущее значение счетчика и отделенного от бизнес-логики, создаем контракт – `~/contracts/base/UIntStorage.sol`:
 
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/96b3cc4269ae9377c0cd3f733f4fdea1c6acbc5e/contracts/base/UIntStorage.sol)
 ```js
 pragma solidity ^0.4.18;
 
@@ -46,6 +47,8 @@ contract UIntStorage {
 
 ## Бизнес-логика
 Договоримся, что взаимодействие с нашей бизнес-логикой будет осуществляться через два метода: `increaseCounter` и `getCounter` для увеличения счетчика и получения текущего значения соответственно, о чем явно опишем в интерфейсе – `~/contracts/examples/counter/ICounter.sol`:
+
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/8c1b4617038a98d04e898c4d7062b3a03ba3948d/contracts/examples/counter/ICounter.sol)
 ```js
 pragma solidity ^0.4.18;
 
@@ -56,6 +59,7 @@ interface ICounter {
 ``` 
 Далее опишем смарт-контракт бизнес-логики из первой стадии реализующий `ICounter` интерфейс и использующий ранее описанное хранилище – `~/contracts/examples/counter/IncrementCounter.sol`:
 
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/8c1b4617038a98d04e898c4d7062b3a03ba3948d/contracts/examples/counter/IncrementCounter.sol)
 ```js
 pragma solidity ^0.4.18;
 
@@ -81,6 +85,8 @@ __Важно отметить__, что `IncrementCounter` не имеет вн�
 _Если договориться передавать в метод `increaseCounter` и `getCounter` ссылку на хранилище первым аргуметом, можно реализовать стейт-лесс бизнес-логику_
 
 Вносим изменения в `~/contracts/examples/counter/ICounter.sol`:
+
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/a5be307196434b82cf89c556b8cb7bf51a887c38/contracts/examples/counter/ICounter.sol)
 ```js
 pragma solidity ^0.4.18;
 
@@ -94,6 +100,7 @@ interface ICounter {
 Теперь методы бизнес-логики ждут первым агрументом ссылку на хранилище, а так же реализуют метод проверки хранилища на валидность: `validateStorage(address _storage)`
 
 Внесем изменения в реализацию первой стадии – `~/contracts/examples/counter/IncrementCounter.sol`:
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/a5be307196434b82cf89c556b8cb7bf51a887c38/contracts/examples/counter/IncrementCounter.sol)
 ```js
 pragma solidity ^0.4.18;
 
@@ -217,6 +224,8 @@ contract('IncrementCounter', ([owner, user]) => {
   2 failing
 ```
 
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/e585fdff06240ec45e7eb14ce8b8b2761e132a1c/test/IncrementCounter.test.js)
+
 
 ## Владение хранилищем
 Проблема текущего решения в том, что хранилище никак не ограничивает запись и злоумышленик может изменить данные в хранилище игнорирую бизнес-логику контракта счетчика.
@@ -229,6 +238,7 @@ __Задача__ сделать так, чтобы изменять хранил
 
 Наследуем хранилище от `Ownable` контракта и добавим модификатор `onlyOwner` на метод `setValue()`:
 
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/969d0500da0a4f9b5be97c5509e28add7e26380c/contracts/base/UIntStorage.sol)
 ```js
 pragma solidity ^0.4.18;
 
@@ -254,6 +264,8 @@ contract UIntStorage is Ownable {
 
 Поздравляю, теперь в наше хранилище может писать только ассоциированный владелец хранилища! Теперь уже 3 из 6 теста проваливаются! Давайте в тестах "в ручную" передадим бизнес-логики управление хранилищем:
 
+
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/dc9e38e4b3ad176558efbdb30b19f3a836c2757c/test/IncrementCounter.test.js)
 ```js
   before(async () => {
     storage = await UIntStorage.new()
@@ -270,6 +282,7 @@ contract UIntStorage is Ownable {
 
 Перед реализацией общего контроллера сделаем еще один контракт счетчика, но уже второй стадии – `~/contracts/examples/counter/IncrementCounterPhaseTwo.sol`:
 
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/dc9e38e4b3ad176558efbdb30b19f3a836c2757c/contracts/examples/counter/IncrementCounterPhaseTwo.sol)
 ```js
 pragma solidity ^0.4.18;
 
@@ -287,6 +300,8 @@ contract IncrementCounterPhaseTwo is IncrementCounter {
 ```
 
 Теперь когда у нас есть две реализации счетчика и `Ownable` хранилище, становится понятно, что необходимо как-то "просить" одну реализацию отдать другой управление хранилищем. Добавим метод `transferStorage(address _storage, address _counter)` в интерфейс счетчиков – `~/contracts/examples/counter/ICounter.sol`:
+
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/dc9e38e4b3ad176558efbdb30b19f3a836c2757c/contracts/examples/counter/ICounter.sol)
 ```js
 pragma solidity ^0.4.18;
 
@@ -303,6 +318,7 @@ interface ICounter {
 
 Договоримся, что финальная реализация `ICounter` должна  после вызова метода `transferStorage` отдавать управление хранилищем адресу переданному в параметр `_counter`:
 
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/dc9e38e4b3ad176558efbdb30b19f3a836c2757c/contracts/examples/counter/IncrementCounter.sol)
 ```js
   function transferStorage(address _storage, address _counter) validStorage(_storage) public returns (bool) {
     return UIntStorage(_storage).transferOwnership(_counter);
@@ -382,6 +398,7 @@ interface ICounter {
 
 __Основная задача__ общего контроллера будет управлять передачей прав и не допускать кого-угодно к этому процессу. Сначала изменим `IncrementCounter` по аналогии с `UIntStorage`, чтобы он тоже наследовал логику `Ownable` и ограничивал взаимодействие с хранилищем:
 
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/2f3547721e003d639a562ed87f36b3353c8557bf/contracts/examples/counter/IncrementCounter.sol)
 ```js
 pragma solidity ^0.4.18;
 
@@ -435,6 +452,8 @@ contract IncrementCounter is ICounter, Ownable {
 3) Отклонение попыток неавторизированного обновление реализации
 
 `~/contracts/examples/counter/CounterContrller.sol`:
+
+[Source Url](https://github.com/alerdenisov/upgradable-contracts/blob/2f3547721e003d639a562ed87f36b3353c8557bf/contracts/examples/counter/CounterController.sol)
 ```js
 pragma solidity ^0.4.18;
 
