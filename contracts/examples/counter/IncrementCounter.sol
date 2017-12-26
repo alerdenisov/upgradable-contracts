@@ -25,7 +25,7 @@ import "../../base/UIntStorage.sol";
 
 /// @title Incremental implementation of counter for explanation external storage pattern
 /// @author Aler Denisov
-contract IncrementCounter is ICounter {
+contract IncrementCounter is ICounter, Ownable {
   /// @notice Method modifier to ensure providen storage is UIntStorage
   /// @param _storage Instance of uint storage of counter
   /// @dev Throw error if storage isn't valid
@@ -38,7 +38,7 @@ contract IncrementCounter is ICounter {
   /// @param _storage Instance of uint storage of counter
   /// @dev Implementation of Counter interface 
   /// @return Current value of counter (after increment)
-  function increaseCounter(address _storage) validStorage(_storage) public returns (uint) {
+  function increaseCounter(address _storage) onlyOwner validStorage(_storage) public returns (uint) {
     UIntStorage counter = UIntStorage(_storage);
     require(counter.isUIntStorage());
     return counter.setValue(counter.getValue() + 1);
@@ -64,7 +64,7 @@ contract IncrementCounter is ICounter {
   /// @param _storage Instance of uint storage of counter
   /// @param _counter Instance of ICounter implementation to transfer ownership
   /// @return True if ownership is transfered, false\revert overwise
-  function transferStorage(address _storage, address _counter) validStorage(_storage) public returns (bool) {
+  function transferStorage(address _storage, address _counter) onlyOwner validStorage(_storage) public returns (bool) {
     UIntStorage(_storage).transferOwnership(_counter);
     return true;
   }
