@@ -40,7 +40,6 @@ contract IncrementCounter is ICounter, Ownable {
   /// @return Current value of counter (after increment)
   function increaseCounter(address _storage) onlyOwner validStorage(_storage) public returns (uint) {
     UIntStorage counter = UIntStorage(_storage);
-    require(counter.isUIntStorage());
     return counter.setValue(counter.getValue() + 1);
   }
 
@@ -49,7 +48,6 @@ contract IncrementCounter is ICounter, Ownable {
   /// @return Current value of counter 
   function getCounter(address _storage) validStorage(_storage) public view returns (uint) {
     UIntStorage counter = UIntStorage(_storage);
-    require(counter.isUIntStorage());
     return counter.getValue();
   }
 
